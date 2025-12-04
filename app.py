@@ -120,9 +120,10 @@ if mic_recorder is None:
 audio = mic_recorder(
     start_prompt="🎧 Start recording",
     stop_prompt="🛑 Stop recording",
-    just_once=False,         # ✅ keep returning the last audio
+    just_once=False,          # keep this so audio persists on rerun
     use_container_width=True,
     key="recorder",
+    format="wav",             #IMPORTANT
 )
 
 if audio is not None:
