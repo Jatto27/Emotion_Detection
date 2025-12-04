@@ -1,4 +1,4 @@
-
+import soundfile as sf
 import io
 import numpy as np
 import streamlit as st
@@ -35,19 +35,30 @@ model, scaler, label_encoder = load_artifacts()
 
 def extract_features_from_audio_bytes(audio_bytes, target_sr=16000, n_mfcc=40):
     """
-    Convert raw WAV bytes from the microphone into a 240‑dim feature vector.
+    Convert raw audio bytes from the microphone into a 240-dim feature vector.
 
-    Assumes MFCC + delta + delta‑delta with mean and std over time:
+    Assumes MFCC + delta + delta-delta with mean and std over time:
       40 MFCC
       40 delta
-      40 delta‑delta
+      40 delta-delta
     → 120 coefficients
     → mean + std → 240 features total
     """
-    # Load audio as mono, resampled
-    y, sr = librosa.load(io.BytesIO(audio_bytes), sr=target_sr, mono=True)
+    # 1) Try to read the bytes as audio using soundfile
+    data, sr = sf.read(io.BytesIO(audio_bytes), dtype="float32")
 
-    # 25 ms window, 10 ms hop
+    # If stereo, average to mono
+    if data.ndim > 1:
+        data = data.mean(axis=1)
+
+    y = data
+
+    # 2) If sample rate doesn't match training SR, resample with librosa
+    if sr != target_sr:
+        y = librosa.resample(y, orig_sr=sr, target_sr=target_sr)
+        sr = target_sr
+
+    # 3) 25 ms window, 10 ms hop (same as RAVDESS pipeline)
     n_fft = int(0.025 * sr)
     hop_length = int(0.010 * sr)
 
@@ -69,6 +80,7 @@ def extract_features_from_audio_bytes(audio_bytes, target_sr=16000, n_mfcc=40):
     clip_features = np.concatenate([mean_feats, std_feats], axis=0)  # (240,)
 
     return clip_features.astype(np.float32)
+
 
 
 def predict_emotion_from_bytes(audio_bytes):
@@ -114,6 +126,7 @@ audio = mic_recorder(
 )
 
 if audio is not None:
+    st.write("Audio keys:", list(audio.keys()))
     st.audio(audio["bytes"], format="audio/wav")
 
     if st.button("Analyze Emotion"):
