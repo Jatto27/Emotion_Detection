@@ -4,6 +4,6 @@ librosa
 soundfile
 numpy
 scikit-learn
-xgboost
 joblib
+
 pandas
