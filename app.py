@@ -10,7 +10,7 @@ from streamlit_mic_recorder import mic_recorder
 
 @st.cache_resource
 def load_artifacts():
-    predictor = joblib.load("machinelearningmodel.joblib")
+    predictor = joblib.load("MLModel.joblib")
     scaler = joblib.load("scaler.joblib")
     label_encoder = joblib.load("label_encoder.joblib")
     return predictor, scaler, label_encoder
