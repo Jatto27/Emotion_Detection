@@ -10,17 +10,10 @@ from streamlit_mic_recorder import mic_recorder
 
 @st.cache_resource
 def load_artifacts():
-    """
-    Load trained XGBoost model, scaler, and label encoder.
-    They must be in the same folder as this app.py:
-      - xgboost_model.joblib
-      - scaler.joblib
-      - label_encoder.joblib
-    """
-    xgb_model = joblib.load("xgboost_model.joblib")
+    predictor = joblib.load("machinelearningmodel.joblib")
     scaler = joblib.load("scaler.joblib")
     label_encoder = joblib.load("label_encoder.joblib")
-    return xgb_model, scaler, label_encoder
+    return predictor, scaler, label_encoder
 
 
 model, scaler, label_encoder = load_artifacts()
