@@ -4,15 +4,8 @@ import numpy as np
 import streamlit as st
 import joblib
 import librosa
+from streamlit_mic_recorder import mic_recorder
 
-try:
-    from streamlit_mic_recorder import mic_recorder
-except ImportError:
-    mic_recorder = None
-    st.error(
-        "streamlit-mic-recorder is not installed. "
-        "Add 'streamlit-mic-recorder' to your requirements.txt."
-    )
 
 
 @st.cache_resource
